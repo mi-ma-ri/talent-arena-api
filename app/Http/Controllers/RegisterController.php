@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Exception;
 use stdClass;
-use App\Consts\CommonConsts;
-use RegisterExistsKeyRequest;
-use App\Http\Requests\RegisterGetAuthKeyRequest;
 use App\Services\RegisterService;
+use App\Http\Requests\RegisterGetAuthKeyRequest;
+use App\Http\Requests\RegisterExistsKeyRequest;
+use App\Http\Requests\RegisterPlayerCheckRequest;
+use App\Consts\CommonConsts;
 
 class RegisterController extends Controller
 {
@@ -18,26 +19,27 @@ class RegisterController extends Controller
     ) {}
 
     /**
-     * 仮登録用の認証キーとrole_idを返す
+     * 仮登録用の認証キーとsubject_idを返す
      * @param $request->email
-     * @param $request->user_status
-     * @param $request->user_type
+     * @param $request->status
+     * @param $request->subject_type
      * @return string $key
-     * @return int $role_id
+     * @return int $subject_id
      */
     public function getRegisterAuthKey(RegisterGetAuthKeyRequest $request)
     {
         try {
+            # 仮登録用の認証キーとidを取得
             $key = $this->register_service->getRegisterAuthKey(
                 $request->email,
-                $request->user_status,
-                $request->user_type,
+                $request->status,
+                $request->subject_type,
             );
             $result = [
                 'result_code' => 200,
                 'result_message' => 'OK',
                 'key' => $key->key,
-                'role_id' => $key->role_id
+                'subject_id' => $key->subject_id
             ];
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -56,12 +58,55 @@ class RegisterController extends Controller
     {
         $result = new stdClass;
         try {
-            if($this->register_service->existsKey($request->table, $request->key)) {
+            if ($this->register_service->existsKey($request->table, $request->key)) {
                 $result->result_code = 200;
                 $result->result_message = 'OK';
             } else {
-                throw new Exception('正しいキーではありません。');  
+                throw new Exception('正しいキーではありません。');
             }
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result->result_code = '400';
+            $result->result_message = $e->getMessage();
+        }
+        return response()->json($result);
+    }
+    /**
+     * 【説明】登録用のプレイヤー情報を取得する
+     * @param $request->key
+     * @return object $player
+     */
+    public function getRegisterPlayer(RegisterPlayerCheckRequest $request)
+    {
+        Log::info($request);
+        $result = new stdClass;
+        try {
+            $result->result_code = 200;
+            $result->result_message = 'OK';
+            $result->player = $this->register_service->getRegisterPlayer($request->auth_key);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result->result_code = '400';
+            $result->result_message = $e->getMessage();
+        }
+        return response()->json($result);
+    }
+
+    /**
+     * 【説明】選手情報本登録
+     * @param $request
+     * @return bool true
+     */
+    public function postJoin(Request $request)
+    {
+        $result = new stdClass;
+        try {
+            $this->register_service->postJoin(
+                $request->all(),
+                CommonConsts::IS_MEMBER,
+            );
+            $result->result_code = 200;
+            $result->result_message = 'OK';
         } catch (Exception $e) {
             Log::error($e->getMessage());
             $result->result_code = '400';

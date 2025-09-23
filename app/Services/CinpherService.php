@@ -59,6 +59,29 @@ class CinpherService extends BaseService
     }
 
     /**
+     * 復号
+     * 方法：第一引数の文字列を第二引数で復号したものを、さらに共通ソルトで復号したものを返します。
+     * 失敗した場合はfalseを返します。
+     */
+    public function decrypt(string $encrepted, string $salt, string $iv): string
+    {
+        $decrypt_by_common_salt = @openssl_decrypt(
+            $encrepted,
+            self::OPEN_SSL_METHOD,
+            config('app.common_salt'),
+            0,
+            $iv
+        );
+        return @openssl_decrypt(
+            $decrypt_by_common_salt,
+            self::OPEN_SSL_METHOD,
+            $salt,
+            0,
+            $iv
+        );
+    }
+
+    /**
      * パラメータの文字列+共通ソルトを素材にsha256でハッシュ化します
      */
     public function hash(string $str): string

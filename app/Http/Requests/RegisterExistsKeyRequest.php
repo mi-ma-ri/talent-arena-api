@@ -23,15 +23,14 @@ class RegisterExistsKeyRequest extends FormRequest
      */
     public function rules(): array
     {
-        $service = new RegisterService;
-
         return [
             'table' => [
                 'bail',
                 'required',
                 function (string $attribute, mixed $value, Closure $fail) {
-                if (!$service->containsKey($value)) {
-                        $fail('指定したテーブルは存在しません。');
+                    $service = new RegisterService;
+                    if (!$service->containsKey($value)) {
+                            $fail('指定したテーブルは存在しません。');
                     }
                 },
             ],

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 use stdClass;
 use Carbon\Carbon;
+use Throwable;
 
 class RegisterService extends BaseService
 {
@@ -20,11 +21,11 @@ class RegisterService extends BaseService
   /**
    * 【説明】仮登録用の認証キーを生成する
    * @param string $email
-   * @param int $user_status
-   * @param int $user_type
+   * @param int $status
+   * @param int $subject_type
    * @return string
    */
-  public function getRegisterAuthKey(string $email, int $user_status, int $user_type): object
+  public function getRegisterAuthKey(string $email, int $status, int $subject_type): object
   {
     try {
       $cinpher_service = new CinpherService();
@@ -34,25 +35,25 @@ class RegisterService extends BaseService
       $encrypt_param = $cinpher_service->getDecryptParam($email);
 
       # ユーザーロールの評価
-      $is_roll = false;
-      $user_type = $is_roll ? CommonConsts::USER_TYPE_TEAMS : CommonConsts::USER_TYPE_PLAYERS;
+      $is_type = false;
+      $subject_type = $is_type ? CommonConsts::SUBJECT_TYPE_TEAMS : CommonConsts::SUBJECT_TYPE_PLAYERS;
 
       # 仮登録済みかどうかの判定
-      $encrypt_param = $this->_changeEncryptParam($encrypt_param, $email, $user_status, $user_type);
+      $encrypt_param = $this->_changeEncryptParam($encrypt_param, $email, $status, $subject_type);
 
-      # ユーザー情報を取得
+      # ユーザー情報を取得 選手・チーム共通
       DB::beginTransaction();
-      $member = $this->_getMember($encrypt_param, $user_status, $user_type);
+      $subject_tmp = $this->_getSubjectTmp($encrypt_param, $status, $subject_type);
 
       # 仮登録毎にauth_keys.auth_keyの削除
-      AuthKey::where('id', $member->id)
+      AuthKey::where('subject_id', $subject_tmp->id)
         ->whereNull('auth_date')
         ->delete();
 
       # auth_keyの生成
       $key = AuthKey::create([
-        'role_id' => $member->id,
-        'user_type' => $user_type,
+        'subject_id' => $subject_tmp->id,
+        'subject_type' => $subject_type,
         'auth_key' => $this->_createKey('auth_keys'),
         'expire_date' => (new Carbon())->addDay()->format('Y-m-d H:i:s')
       ]);
@@ -62,7 +63,7 @@ class RegisterService extends BaseService
       }
 
       $result->key = $key->auth_key;
-      $result->role_id = $key->id;
+      $result->subject_id = $key->subject_id;
 
       DB::commit();
       return $result;
@@ -90,19 +91,19 @@ class RegisterService extends BaseService
    * @param int $is_tmp_member
    * @return string
    */
-  private function _changeEncryptParam(stdClass $encrypt_param, string $email, int $user_status, int $user_type): stdClass
+  private function _changeEncryptParam(stdClass $encrypt_param, string $email, int $status, int $subject_type): stdClass
   {
     $cinpher_service = new CinpherService();
 
     # 仮登録情報を取得
-    if ($user_type == CommonConsts::USER_TYPE_PLAYERS) {
+    if ($subject_type == CommonConsts::SUBJECT_TYPE_PLAYERS) {
       $uncertified = DB::table('players AS p')
-        ->where('p.players_status', $user_status)
+        ->where('p.players_status', $status)
         ->where('p.ms_hash', $encrypt_param->ms_hash)
         ->first();
-    } elseif ($user_type == CommonConsts::USER_TYPE_TEAMS) {
+    } elseif ($subject_type == CommonConsts::SUBJECT_TYPE_TEAMS) {
       $uncertified = DB::table('teams AS t')
-        ->where('t.teams_status', $user_status)
+        ->where('t.teams_status', $status)
         ->where('t.ms_hash', $encrypt_param->ms_hash)
         ->first();
     } else {
@@ -126,23 +127,23 @@ class RegisterService extends BaseService
     return $encrypt_param;
   }
 
-  private function _getMember(stdClass $encrypt_param, int $user_status, int $user_type): Player
+  private function _getSubjectTmp(stdClass $encrypt_param, int $status, int $subject_type): Player
   {
 
-    if ($user_type == CommonConsts::USER_TYPE_PLAYERS) {
+    if ($subject_type == CommonConsts::SUBJECT_TYPE_PLAYERS) {
       $registred = DB::table('players AS p')
         ->where('p.ms_hash', $encrypt_param->ms_hash)
         ->get();
     }
 
-    if ($user_type == CommonConsts::USER_TYPE_TEAMS) {
+    if ($subject_type == CommonConsts::SUBJECT_TYPE_TEAMS) {
       $registred = DB::table('teams AS t')
         ->where('t.ms_hash', $encrypt_param->ms_hash)
         ->first();
     }
 
     foreach ($registred as $row) {
-      $status = $user_type == CommonConsts::USER_TYPE_PLAYERS
+      $status = $subject_type == CommonConsts::SUBJECT_TYPE_PLAYERS
         ? $row->players_status
         : $row->teams_status;
 
@@ -151,19 +152,19 @@ class RegisterService extends BaseService
       }
     }
 
-    $member = $this->registerTempUser($user_type, $user_status, $encrypt_param);
+    $member = $this->registerTempUser($subject_type, $status, $encrypt_param);
 
     return $member;
   }
 
-  private function registerTempUser(int $user_type, int $user_status, stdClass $encrypt_param): Player
+  private function registerTempUser(int $subject_type, int $status, stdClass $encrypt_param): Player
   {
     try {
       DB::beginTransaction();
-      # 仮登録情報をplayersテーブルに保存 111
-      if ($user_type == CommonConsts::USER_TYPE_PLAYERS) {
+      # 仮登録情報をplayersテーブルに保存
+      if ($subject_type == CommonConsts::SUBJECT_TYPE_PLAYERS) {
         $member = Player::create([
-          'players_status' => $user_status,
+          'players_status' => $status,
           'ms' => $encrypt_param->ms,
           'ms_hash' => $encrypt_param->ms_hash,
           'unique_salt' => $encrypt_param->unique_salt,
@@ -172,7 +173,7 @@ class RegisterService extends BaseService
       }
 
       // # 仮登録情報をteamsテーブルに保存
-      // if ($user_type == CommonConsts::USER_TYPE_TEAMS) {
+      // if ($subject_type == CommonConsts::USER_TYPE_TEAMS) {
       //   $member = DB::table('teams')->insert([
       //     'team_status' => $user_status,
       //     'ms' => $encrypt_param->ms,
@@ -214,7 +215,7 @@ class RegisterService extends BaseService
    * @param string $table
    * @return bool
    */
-  private function containsKey(string $table): bool
+  public function containsKey(string $table): bool
   {
     return in_array($table, $this->auth_key_table);
   }
@@ -232,5 +233,71 @@ class RegisterService extends BaseService
       ->whereNull('auth_date')
       ->where('expire_date', '>', (new Carbon())->format('Y-m-d H:i:s'))
       ->exists();
+  }
+
+  /**
+   * 【説明】認証処理中のプレイヤー情報を取得する
+   * @param array $params
+   * @return object
+   */
+  public function getRegisterPlayer(string $key): object
+  {
+    try {
+      $cinpher_service = new CinpherService();
+
+      # 仮登録情報を取得
+      $player = DB::table('auth_keys AS au')
+        ->join('players AS p', 'au.subject_id', 'p.id')
+        ->select('p.players_status', 'p.ms', 'p.unique_salt', 'p.ms_v', 'au.subject_id')
+        ->where('auth_key', $key)
+        ->whereNull('auth_date')
+        ->where('expire_date', '>', (new Carbon())->format('Y-m-d H:i:s'))
+        ->first();
+
+      if (empty($player)) {
+        throw new Exception('プレイヤー情報を取得できません。');
+      }
+
+      $player->email = $cinpher_service->decrypt(
+        $player->ms,
+        $player->unique_salt,
+        $player->ms_v
+      );
+
+      return $player;
+    } catch (Throwable $e) {
+      throw new Exception($e->getMessage());
+    }
+  }
+
+  public function postJoin(array $params, $status): void
+  {
+    try {
+      DB::beginTransaction();
+      // playersテーブルの更新
+      DB::table('players')
+        ->where('id', $params['subject_id'])
+        ->update([
+          'players_status' => $status,
+          'first_name' => $params['first_name'],
+          'second_name' => $params['second_name'],
+          'affiliated_team' => $params['affiliated_team'],
+          'position' => $params['position'],
+          'birth_date' => $params['birth_date'],
+        ]);
+
+      // auth_keysテーブルの更新
+      DB::table('auth_keys')
+        ->where('subject_id', $params['subject_id'])
+        ->update([
+          'auth_date' => (new Carbon())->format('Y-m-d H:i:s'),
+          'updated_at' => (new Carbon())->format('Y-m-d H:i:s'),
+        ]);
+
+      DB::commit();
+    } catch (Throwable $e) {
+      DB::rollBack();
+      throw new Exception('登録に失敗しました。理由: ' . $e->getMessage());
+    }
   }
 }

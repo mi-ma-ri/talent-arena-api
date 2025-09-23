@@ -6,7 +6,7 @@ class CommonConsts
 {
   /*
     |--------------------------------------------------------------------------
-    | user_status(登録処理が共通のため選手とチーム共通)
+    | status(登録処理が共通のため選手とチーム共通)
     |--------------------------------------------------------------------------
   */
   public const IS_TMP_MEMBER = 0;
@@ -16,9 +16,9 @@ class CommonConsts
 
   /*
     |--------------------------------------------------------------------------
-    | user_type
+    | subject_type
     |--------------------------------------------------------------------------
   */
-  public const USER_TYPE_PLAYERS = 0; // 選手
-  public const USER_TYPE_TEAMS = 1; // スカウトチーム
+  public const SUBJECT_TYPE_PLAYERS = 0; // 選手
+  public const SUBJECT_TYPE_TEAMS = 1; // スカウトチーム
 }

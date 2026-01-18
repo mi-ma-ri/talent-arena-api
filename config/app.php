@@ -36,6 +36,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'asset_url' => env('ASSET_URL'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -50,11 +52,11 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'locale' => 'en',
+    'locale' => 'ja',
 
     'fallback_locale' => 'en',
 
-    'faker_locale' => 'en_US',
+    'faker_locale' => 'ja_JP',
 
     /*
     |--------------------------------------------------------------------------
@@ -80,6 +82,11 @@ return [
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
+    |
+    | The service providers listed here will be automatically loaded on the
+    | request to your application. Feel free to add your own services to
+    | this array to grant expanded functionality to your applications.
+    |
     */
 
     'providers' => [
@@ -129,6 +136,11 @@ return [
     |--------------------------------------------------------------------------
     | Class Aliases
     |--------------------------------------------------------------------------
+    |
+    | This array of class aliases will be registered when this application
+    | is started. However, feel free to register as many as you wish as
+    | the aliases are "lazy" loaded so they don't hinder performance.
+    |
     */
 
     'aliases' => Illuminate\Support\Facades\Facade::defaultAliases()->merge([

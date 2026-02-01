@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
 use App\Http\Requests\LoginGetRestoreRequest;
+use App\Services\LoginService;
 
 
 class LoginController extends Controller
@@ -19,12 +19,15 @@ class LoginController extends Controller
      * ログイン処理 メール・パスワードの一致確認
      * @param $request->email
      * @param $request->password
-     * @param $request->status
-     * @return bool True
+     * @return bool
      */
-    public function LoginGetRestoreRequest(LoginGetRestoreRequest $request)
+    public function login(LoginGetRestoreRequest $request)
     {
         try {
+            $player = $this->login_service->authenticate($request->email, $request->password);
+            if (!$player) {
+                throw new Exception('メールアドレスまたはパスワードが正しくありません。');
+            }
             $result = [
                 'result_code' => 200,
                 'result_message' => 'OK',
@@ -32,7 +35,7 @@ class LoginController extends Controller
         } catch (Exception $e) {
             Log::error($e->getMessage());
             $result = [
-                'result_code' => 400,
+                'result_code' => 401,
                 'result_message' => $e->getMessage(),
             ];
         }

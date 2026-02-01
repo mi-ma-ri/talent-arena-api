@@ -18,6 +18,6 @@ Route::controller(App\Http\Controllers\LoginController::class)
     ->name('login.')
     ->prefix('login')
     ->group(function () {
-        Route::get('restore', 'LoginGetRestoreRequest')->name('get.restore');
-        Route::post('create_email', 'getRegisterAuthKey')->name('post.get_registerAuthKey');
+        Route::get('restore', 'login')->name('get.restore');
+        Route::post('restore', 'login')->name('post.restore');
     });

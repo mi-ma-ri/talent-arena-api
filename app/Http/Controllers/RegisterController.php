@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Log;
 use Exception;
 use stdClass;
 use App\Services\RegisterService;
+use App\Consts\CommonConsts;
 use App\Http\Requests\RegisterGetAuthKeyRequest;
 use App\Http\Requests\RegisterExistsKeyRequest;
 use App\Http\Requests\RegisterPlayerCheckRequest;
-use App\Consts\CommonConsts;
 
 class RegisterController extends Controller
 {

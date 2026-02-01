@@ -14,7 +14,10 @@ Route::controller(App\Http\Controllers\RegisterController::class)
         Route::post('join', 'postJoin')->name('post.join');
     });
 
-    // 変数名や処理に適した意味で考慮(変数名、定数、メソッドなど)
-    // 本登録完了処理時、メールが送付されるようにする
-    // auth_keyがちゃんと削除されているかどうか
-    // 本登録完了処理時、ログイン状態にする
+Route::controller(App\Http\Controllers\LoginController::class)
+    ->name('login.')
+    ->prefix('login')
+    ->group(function () {
+        Route::get('restore', 'login')->name('get.restore');
+        Route::post('restore', 'login')->name('post.restore');
+    });

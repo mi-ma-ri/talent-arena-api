@@ -282,6 +282,7 @@ class RegisterService extends BaseService
           'first_name' => $params['first_name'],
           'second_name' => $params['second_name'],
           'affiliated_team' => $params['affiliated_team'],
+          'password' => $params['password'],
           'position' => $params['position'],
           'birth_date' => $params['birth_date'],
         ]);

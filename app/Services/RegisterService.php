@@ -6,6 +6,7 @@ use App\Consts\CommonConsts;
 use App\Models\Player;
 use App\Models\AuthKey;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Exception;
 use stdClass;
 use Carbon\Carbon;
@@ -171,17 +172,6 @@ class RegisterService extends BaseService
           'ms_v' => $encrypt_param->ms_v,
         ]);
       }
-
-      // # 仮登録情報をteamsテーブルに保存
-      // if ($subject_type == CommonConsts::USER_TYPE_TEAMS) {
-      //   $member = DB::table('teams')->insert([
-      //     'team_status' => $user_status,
-      //     'ms' => $encrypt_param->ms,
-      //     'ms_hash' => $encrypt_param->ms_hash,
-      //     'unique_salt' => $encrypt_param->unique_salt,
-      //     'ms_v' => $encrypt_param->ms_v,
-      //   ]);
-      // }
       if (!$member) {
         throw new Exception('member insert error');
       }
@@ -282,7 +272,7 @@ class RegisterService extends BaseService
           'first_name' => $params['first_name'],
           'second_name' => $params['second_name'],
           'affiliated_team' => $params['affiliated_team'],
-          'password' => $params['password'],
+          'password' => Hash::make($params['password']),
           'position' => $params['position'],
           'birth_date' => $params['birth_date'],
         ]);

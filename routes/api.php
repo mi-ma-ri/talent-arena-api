@@ -18,6 +18,6 @@ Route::controller(App\Http\Controllers\LoginController::class)
     ->name('login.')
     ->prefix('login')
     ->group(function () {
-        Route::get('restore', 'login')->name('get.restore');
-        Route::post('restore', 'login')->name('post.restore');
+        Route::get('auth', 'auth')->name('get.auth');
+        Route::post('auth', 'auth')->name('post.auth');
     });

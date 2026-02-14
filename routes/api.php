@@ -21,3 +21,11 @@ Route::controller(App\Http\Controllers\LoginController::class)
         Route::get('auth', 'auth')->name('get.auth');
         Route::post('auth', 'auth')->name('post.auth');
     });
+
+Route::controller(App\Http\Controllers\PlayerController::class)
+    ->middleware('auth:sanctum')
+    ->name('player.')
+    ->prefix('player')
+    ->group(function () {
+        Route::get('profile', 'getProfile')->name('get.profile');
+    });

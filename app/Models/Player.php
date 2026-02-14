@@ -11,4 +11,5 @@ class Player extends Authenticatable
 
     protected $table = 'players';
     protected $guarded = ['id'];
+    protected $hidden = ['password'];
 }

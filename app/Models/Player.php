@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Player extends Model
+class Player extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens;
 
     protected $table = 'players';
-
     protected $guarded = ['id'];
+    protected $hidden = ['password'];
 }

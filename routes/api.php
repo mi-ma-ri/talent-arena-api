@@ -18,6 +18,14 @@ Route::controller(App\Http\Controllers\LoginController::class)
     ->name('login.')
     ->prefix('login')
     ->group(function () {
-        Route::get('restore', 'login')->name('get.restore');
-        Route::post('restore', 'login')->name('post.restore');
+        Route::get('auth', 'auth')->name('get.auth');
+        Route::post('auth', 'auth')->name('post.auth');
+    });
+
+Route::controller(App\Http\Controllers\PlayerController::class)
+    ->middleware('auth:sanctum')
+    ->name('player.')
+    ->prefix('player')
+    ->group(function () {
+        Route::get('profile', 'getProfile')->name('get.profile');
     });

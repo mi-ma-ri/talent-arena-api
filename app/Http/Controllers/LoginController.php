@@ -17,20 +17,24 @@ class LoginController extends Controller
 
     /**
      * ログイン処理 メール・パスワードの一致確認
+     * トークン生成
      * @param $request->email
      * @param $request->password
-     * @return bool
+     * @return array
      */
-    public function login(LoginGetRestoreRequest $request)
+    public function auth(LoginGetRestoreRequest $request)
     {
         try {
-            $player = $this->login_service->authenticate($request->email, $request->password);
-            if (!$player) {
-                throw new Exception('メールアドレスまたはパスワードが正しくありません。');
+            $player = $this->login_service->auth($request->email, $request->password);
+            if ($player == null) {
+                throw new Exception('存在しないユーザーです。');
             }
+            $token = $player->createToken('player-token')->plainTextToken;
+
             $result = [
                 'result_code' => 200,
                 'result_message' => 'OK',
+                'token' => $token
             ];
         } catch (Exception $e) {
             Log::error($e->getMessage());

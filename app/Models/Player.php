@@ -12,4 +12,9 @@ class Player extends Authenticatable
     protected $table = 'players';
     protected $guarded = ['id'];
     protected $hidden = ['password'];
+
+    public function playerVideos()
+    {
+        return $this->hasMany(PlayerVideo::class);
+    }
 }

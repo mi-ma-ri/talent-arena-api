@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
 use App\Services\PlayerService;
-use App\Services\CinpherService;
 
 
 
@@ -35,6 +33,37 @@ class PlayerController extends Controller
                 'result_code' => 200,
                 'result_message' => 'OK',
                 'profile' => $profile
+            ];
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result = [
+                'result_code' => 400,
+                'result_message' => $e->getMessage(),
+            ];
+        }
+
+        return response()->json($result);
+    }
+
+    /**
+     * 動画URL投稿
+     * @param $request
+     * @return bool $insert
+     */
+    public function postHandleUrl(Request $request)
+    {
+        try {
+            $player = $request->user();
+
+            $insert = $this->player_service->postHandleUrl($player, $request);
+            if (!$insert) {
+                throw new Exception('動画URL投稿に失敗しました。');
+            }
+
+            $result = [
+                'result_code' => 200,
+                'result_message' => 'OK',
+                'insert' => $insert
             ];
         } catch (Exception $e) {
             Log::error($e->getMessage());

@@ -29,4 +29,5 @@ Route::controller(App\Http\Controllers\PlayerController::class)
     ->group(function () {
         Route::get('profile', 'getProfile')->name('get.profile');
         Route::post('update', 'postProfileUpdate')->name('post.profile_update');
+        Route::post('handle', 'postHandleUrl')->name('post.handle');
     });

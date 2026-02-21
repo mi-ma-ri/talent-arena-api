@@ -61,4 +61,24 @@ class PlayerService extends BaseService
 
     return True;
   }
+
+  /**
+   * 動画URL登録処理
+   * @param Player $player
+   * @param mixed $request
+   * @return bool
+   */
+  public function postHandleUrl(Player $player, mixed $request): bool
+  {
+    $postData = $request->postData;
+
+    $player->playerVideos()->create([
+      'sns_url_1' => $postData['url1'],
+      'sns_url_2' => $postData['url2'],
+      'sns_url_3' => $postData['url3'],
+      'description' => $postData['description'],
+    ]);
+
+    return true;
+  }
 }

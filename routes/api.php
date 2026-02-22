@@ -30,4 +30,5 @@ Route::controller(App\Http\Controllers\PlayerController::class)
         Route::get('profile', 'getProfile')->name('get.profile');
         Route::post('update', 'postProfileUpdate')->name('post.profile_update');
         Route::post('handle', 'postHandleUrl')->name('post.handle');
+        Route::get('url', 'getUrl')->name('get.url');
     });

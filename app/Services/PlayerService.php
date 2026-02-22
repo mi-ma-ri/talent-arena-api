@@ -81,4 +81,30 @@ class PlayerService extends BaseService
 
     return true;
   }
+
+  /**
+   * 動画URL一覧取得
+   * @param Player $player
+   * @return array
+   */
+  public function getUrl(Player $player): array
+  {
+    $videoData = $player->playerVideos()
+      ->orderBy('created_at', 'desc')
+      ->get()
+      ->map(function ($video) {
+        return [
+          'id' => $video->id,
+          'player_id' => $video->player_id,
+          'sns_url_1' => $video->sns_url_1,
+          'sns_url_2' => $video->sns_url_2,
+          'sns_url_3' => $video->sns_url_3,
+          'description' => $video->description,
+          'created_at' => $video->created_at->format('Y-m-d H:i'),
+        ];
+      })
+      ->toArray();
+
+    return $videoData;
+  }
 }

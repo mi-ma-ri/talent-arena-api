@@ -109,4 +109,34 @@ class PlayerController extends Controller
 
         return response()->json($result);
     }
+
+    /**
+     * 選手情報更新
+     * @param $request->token
+     * @return bool $update
+     */
+    public function getUrl(Request $request)
+    {
+        try {
+            $player = $request->user();
+            $video_data = $this->player_service->getUrl($player);
+            if (!$video_data) {
+                throw new Exception('動画URL一覧データを取得できませんでした。');
+            }
+
+            $result = [
+                'result_code' => 200,
+                'result_message' => 'OK',
+                'video_data' => $video_data
+            ];
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result = [
+                'result_code' => 400,
+                'result_message' => $e->getMessage(),
+            ];
+        }
+
+        return response()->json($result);
+    }
 }

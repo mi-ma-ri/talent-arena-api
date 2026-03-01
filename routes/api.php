@@ -10,8 +10,10 @@ Route::controller(App\Http\Controllers\RegisterController::class)
         Route::post('create_email', 'getRegisterAuthKey')->name('post.get_registerAuthKey');
         Route::get('exist_key', 'existsKey')->name('get.existskey');
         Route::post('exist_key', 'existsKey')->name('get.existskey');
-        Route::get('get_register_player', 'getRegisterPlayer')->name('get.get_register_player');
+        Route::get('player', 'getRegisterPlayer')->name('get.player');
+        Route::get('team', 'getRegisterTeam')->name('get.team');
         Route::post('join', 'postJoin')->name('post.join');
+        Route::post('team_join', 'postTeamJoin')->name('post.team_join');
     });
 
 Route::controller(App\Http\Controllers\LoginController::class)

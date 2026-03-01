@@ -6,13 +6,22 @@ class CommonConsts
 {
   /*
     |--------------------------------------------------------------------------
-    | status(登録処理が共通のため選手とチーム共通)
+    | 選手登録ステータス
     |--------------------------------------------------------------------------
   */
   public const IS_TMP_MEMBER = 0;
   public const IS_MEMBER = 1;
-  public const IS_LEAVE_MATCH_MEMBER = 2;
-  public const IS_LEAVE_MEMBER = 3;
+  public const IS_MATCHING_LEAVED = 2; // マッチング退会
+  public const IS_NORMAL_LEAVED   = 3; // 通常退会
+
+  /*
+    |--------------------------------------------------------------------------
+    | チーム登録ステータス
+    |--------------------------------------------------------------------------
+  */
+  public const IS_TMP_TEAM = 0; // 仮登録
+  public const IS_TEAM = 1; // 登録済み
+  public const IS_LEAVED_TEAM = 2; // 退会
 
   /*
     |--------------------------------------------------------------------------

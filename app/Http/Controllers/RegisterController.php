@@ -11,6 +11,7 @@ use App\Consts\CommonConsts;
 use App\Http\Requests\RegisterGetAuthKeyRequest;
 use App\Http\Requests\RegisterExistsKeyRequest;
 use App\Http\Requests\RegisterPlayerCheckRequest;
+use App\Http\Requests\RegisterTeamCheckRequest;
 
 class RegisterController extends Controller
 {
@@ -93,6 +94,26 @@ class RegisterController extends Controller
     }
 
     /**
+     * 【説明】登録用のチーム情報を取得する
+     * @param $request->key
+     * @return object $player
+     */
+    public function getRegisterTeam(RegisterTeamCheckRequest $request)
+    {
+        $result = new stdClass;
+        try {
+            $result->result_code = 200;
+            $result->result_message = 'OK';
+            $result->team = $this->register_service->getRegisterTeam($request->auth_key);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result->result_code = '400';
+            $result->result_message = $e->getMessage();
+        }
+        return response()->json($result);
+    }
+
+    /**
      * 【説明】選手情報本登録
      * @param $request
      * @return bool true
@@ -104,6 +125,29 @@ class RegisterController extends Controller
             $this->register_service->postJoin(
                 $request->all(),
                 CommonConsts::IS_MEMBER,
+            );
+            $result->result_code = 200;
+            $result->result_message = 'OK';
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result->result_code = '400';
+            $result->result_message = $e->getMessage();
+        }
+        return response()->json($result);
+    }
+
+    /**
+     * 【説明】チーム情報本登録処理
+     * @param $request
+     * @return bool true
+     */
+    public function postTeamJoin(Request $request)
+    {
+        $result = new stdClass;
+        try {
+            $this->register_service->postTeamJoin(
+                $request->all(),
+                CommonConsts::IS_TEAM,
             );
             $result->result_code = 200;
             $result->result_message = 'OK';

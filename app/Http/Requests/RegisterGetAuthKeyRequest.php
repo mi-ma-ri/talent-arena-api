@@ -16,7 +16,7 @@ class RegisterGetAuthKeyRequest extends BaseRequest
                 'email',
                 function (string $attribute, mixed $value, Closure $fail) {
                     $register_service = new RegisterService();
-                    $registered = $register_service->findByEmail($value);
+                    $registered = $register_service->findByEmail($value, $this->subject_type);
 
                     if ($registered && $registered->user_status == CommonConsts::IS_MEMBER) {
                         $fail('既に使用されている:attributeです。');

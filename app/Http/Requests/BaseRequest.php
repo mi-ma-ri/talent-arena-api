@@ -40,10 +40,4 @@ class BaseRequest extends FormRequest
         ], 422);
         throw new HttpResponseException($response);
     }
-
-    public function validationData(): array
-    {
-        // GETの場合も含めてクエリパラメータを使う
-        return $this->query();
-    }
 }

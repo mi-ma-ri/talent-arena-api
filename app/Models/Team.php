@@ -11,4 +11,5 @@ class Team extends Authenticatable
 
   protected $table = 'teams';
   protected $guarded = ['id'];
+  protected $hidden = ['password'];
 }

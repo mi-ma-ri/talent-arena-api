@@ -22,6 +22,8 @@ Route::controller(App\Http\Controllers\LoginController::class)
     ->group(function () {
         Route::get('auth', 'auth')->name('get.auth');
         Route::post('auth', 'auth')->name('post.auth');
+        Route::get('team-auth', 'teamAuth')->name('get.auth');
+        Route::post('team-auth', 'teamAuth')->name('post.auth');
     });
 
 Route::controller(App\Http\Controllers\PlayerController::class)

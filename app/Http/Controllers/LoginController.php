@@ -45,4 +45,35 @@ class LoginController extends Controller
         }
         return response()->json($result);
     }
+
+    /**
+     * チームログイン処理 メール・パスワードの一致確認
+     * トークン生成
+     * @param $request->email
+     * @param $request->password
+     * @return array
+     */
+    public function teamAuth(LoginGetRestoreRequest $request)
+    {
+        try {
+            $team = $this->login_service->teamAuth($request->email, $request->password);
+            if ($team == null) {
+                throw new Exception('存在しないユーザーです。');
+            }
+            $token = $team->createToken('team-token')->plainTextToken;
+
+            $result = [
+                'result_code' => 200,
+                'result_message' => 'OK',
+                'token' => $token
+            ];
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result = [
+                'result_code' => 401,
+                'result_message' => $e->getMessage(),
+            ];
+        }
+        return response()->json($result);
+    }
 }

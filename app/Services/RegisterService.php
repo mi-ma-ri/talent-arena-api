@@ -360,12 +360,13 @@ class RegisterService extends BaseService
   {
     try {
       DB::beginTransaction();
-      // playersテーブルの更新
+      // teamsテーブルの更新
       DB::table('teams')
         ->where('id', $params['subject_id'])
         ->update([
           'teams_status' => $status,
           'teams_name' => $params['teams_name'],
+          'password' => Hash::make($params['password']),
           'location' => $params['location'],
           'website' => $params['website'],
           'teams_policy' => $params['teams_policy'],

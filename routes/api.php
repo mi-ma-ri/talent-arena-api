@@ -36,3 +36,12 @@ Route::controller(App\Http\Controllers\PlayerController::class)
         Route::post('handle', 'postHandleUrl')->name('post.handle');
         Route::get('url', 'getUrl')->name('get.url');
     });
+
+Route::controller(App\Http\Controllers\TeamController::class)
+    ->middleware('auth:sanctum')
+    ->name('team.')
+    ->prefix('team')
+    ->group(function () {
+        Route::get('profile', 'getTeamProfile')->name('get.team.profile');
+        Route::post('update', 'postTeamProfileUpdate')->name('post.team.profile_update');
+    });

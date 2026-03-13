@@ -44,4 +44,5 @@ Route::controller(App\Http\Controllers\TeamController::class)
     ->group(function () {
         Route::get('profile', 'getTeamProfile')->name('get.team.profile');
         Route::post('update', 'postTeamProfileUpdate')->name('post.team.profile_update');
+        Route::get('player-videos', 'getPlayerVideos')->name('get.player_videos');
     });

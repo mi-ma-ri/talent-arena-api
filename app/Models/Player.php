@@ -17,4 +17,9 @@ class Player extends Authenticatable
     {
         return $this->hasMany(PlayerVideo::class);
     }
+
+    public function teams()
+    {
+        return $this->hasMany(Team::class);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Consts\CommonConsts;
 use App\Models\Player;
+use App\Models\Team;
 use App\Services\CinpherService;
 use Exception;
 
@@ -106,5 +107,19 @@ class PlayerService extends BaseService
       ->toArray();
 
     return $videoData;
+  }
+
+  /**
+   * 動画URL一覧取得
+   * @return array
+   */
+  public function getTeamsProfile(): array
+  {
+    $teams_profile = Team::select('id', 'teams_name', 'teams_policy', 'location', 'schedule', 'website', 'ob_affiliation')
+      ->Where('teams_status', CommonConsts::IS_TEAM)
+      ->get()
+      ->toArray();
+
+    return $teams_profile;
   }
 }

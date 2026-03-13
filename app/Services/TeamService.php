@@ -2,12 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Log;
-use App\Consts\CommonConsts;
 use App\Models\Team;
+use App\Models\PlayerVideo;
 use App\Services\CinpherService;
-use Exception;
-
 
 class TeamService extends BaseService
 {
@@ -62,5 +59,20 @@ class TeamService extends BaseService
     ]);
 
     return True;
+  }
+
+  /**
+   * 選手投稿URL一覧
+   * @return array $value
+   */
+  public function getPlayerVideos(): array
+  {
+    # 選手が投稿したURL一覧を取得、併せて選手情報も取得
+    $value = PlayerVideo::with('player:id,first_name,second_name,position,affiliated_team,birth_date')
+      ->orderBy('created_at', 'desc')
+      ->get()
+      ->toArray();
+
+    return $value;
   }
 }

@@ -76,4 +76,28 @@ class TeamController extends Controller
 
         return response()->json($result);
     }
+
+    /**
+     * 選手投稿URL一覧
+     * @return array $video_urls
+     */
+    public function getPlayerVideos()
+    {
+        try {
+            $value = $this->team_service->getPlayerVideos();
+            $result = [
+                'result_code' => 200,
+                'result_message' => 'OK',
+                'urls' => $value
+            ];
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result = [
+                'result_code' => 400,
+                'result_message' => $e->getMessage(),
+            ];
+        }
+
+        return response()->json($result);
+    }
 }

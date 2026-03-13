@@ -139,4 +139,32 @@ class PlayerController extends Controller
 
         return response()->json($result);
     }
+
+    /**
+     * チーム情報取得
+     * @return array $teams_profile
+     */
+    public function getTeamsProfile()
+    {
+        try {
+            $teams_profile = $this->player_service->getTeamsProfile();
+            if (!$teams_profile) {
+                throw new Exception('チーム情報を取得できませんでした。');
+            }
+
+            $result = [
+                'result_code' => 200,
+                'result_message' => 'OK',
+                'teams_profile' => $teams_profile
+            ];
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            $result = [
+                'result_code' => 400,
+                'result_message' => $e->getMessage(),
+            ];
+        }
+
+        return response()->json($result);
+    }
 }
